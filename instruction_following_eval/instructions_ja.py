@@ -117,17 +117,17 @@ class Instruction:
 
 
 class KanjiLimit(Instruction):
-  """Check the number of Kanji used in the reponse"""
+  """回答中の漢字の使用回数を制限します。"""
 
   def build_description(self, *, kanji_limit=None, relation=None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      kanji_limit: An integer specifying the number of kanji to be used.
-      relation: A string in (`less than`, `at least`), defining the relational operator for comparison.
+      kanji_limit: 漢字の使用回数を指定する整数。
+      relation: 比較のための関係演算子を定義する文字列（`未満` または `以上`）。
 
     Returns:
-      A string representing the instruction.
+      指示文を表す文字列。
     """
     self._kanji_limit = kanji_limit
     if self._kanji_limit is None or self._kanji_limit < 0:
@@ -144,23 +144,22 @@ class KanjiLimit(Instruction):
       "{kanji_limit}文字{relation}漢字を用いて、答えてください。") 
     return self._description_pattern.format(kanji_limit=self._kanji_limit, 
                                             relation=self._comparison_relation)
-  
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return {"kanji_limit": self._kanji_limit, "relation": self._comparison_relation}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return ["kanji_limit", "relation"]
 
   def check_following(self, value):
-    """Checks if the number of kanji used follows the instruction.
+    """漢字の使用回数が指示に従っているか確認します。
 
     Args:
-      value: A string representing the response.
+      value: 応答を表す文字列。
 
     Returns:
-      True if the number of kanji used follows the instruction, otherwise False.
+      漢字の使用回数が指示に従っていれば True、それ以外は False。
     """
     kanji_count = len(re.findall(r'[\u4e00-\u9faf]', value))
     if self._comparison_relation == _COMPARISON_RELATION[0]:
@@ -170,44 +169,44 @@ class KanjiLimit(Instruction):
 
 
 class NoHiragana(Instruction):
-  """Checks no Hiragana"""
+  """ひらがなを一つも使わずに回答しているか確認します。"""
 
   def build_description(self):
-    """Build the instruction description."""
+    """指示文を作成します。"""
     self._description_pattern = ("ひらがなを一文字も使わないで答えてください。")
     return self._description_pattern
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return {}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return []
 
   def check_following(self, value):
-    """Checks if no hiragana is used."""
+    """ひらがなが使われていないか確認します。"""
     return not any('ぁ'<=char<='ゖ' for char in value)
   
 
 class HiraganaOnly(Instruction):
-  """Checks the response written in Hiragana"""
+  """ひらがなだけで回答しているか確認します。"""
 
   def build_description(self):
-    """Build the instruction description."""
+    """指示文を作成します。"""
     self._description_pattern = ("ひらがなだけを用いて答えてください。")
     return self._description_pattern
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return None
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return []
 
   def check_following(self, value):
-    """Checks if the response uses only hiragana."""
+    """ひらがなだけで回答されているか確認します。"""
     def is_hiragana(char):
       return 'ぁ' <= char <= 'ん' or char == 'ー' or char == '・'
 
@@ -218,44 +217,44 @@ class HiraganaOnly(Instruction):
 
 
 class NoKatakana(Instruction):
-  """Checks no Katakana"""
+  """カタカナを一つも使わずに回答しているか確認します。"""
 
   def build_description(self):
-    """Build the instruction description."""
+    """指示文を作成します。"""
     self._description_pattern = ("カタカナを一文字も使わないで答えてください。")
     return self._description_pattern
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return {}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return []
 
   def check_following(self, value):
-    """Checks if no katakana is used."""
+    """カタカナが使われていないか確認します。"""
     return not any(('ァ'<=char<='ヺ' or 'ｦ'<=char<='ﾝ') for char in value)
 
 
 class KatakanaOnly(Instruction):
-  """Checks the response written in Katakana"""
+  """カタカナだけで回答しているか確認します。"""
 
   def build_description(self):
-    """Build the instruction description."""
+    """指示文を作成します。"""
     self._description_pattern = ("カタカナだけを用いて答えてください。")
     return self._description_pattern
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return None
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return []
 
   def check_following(self, value):
-    """Checks if the response uses only katakana."""
+    """カタカナだけで回答されているか確認します。"""
     def is_katakana(char):
       return ('ァ' <= char <= 'ン' or
               char == 'ー' or
@@ -269,16 +268,16 @@ class KatakanaOnly(Instruction):
 
 
 class SentenceEndingUnification(Instruction):
-  """Check all the sentence endings"""
+  """応答の中で各文の文末が統一されているか確認します。"""
 
   def build_description(self, *, ending=None):
-    """Build the instruction description.
+    """指示文を作成します。
       
     Args:
-      ending: A string used at the end of all sentences.
+      ending: 統一された全ての文末に使用される文字列。
     
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     self._ending = ending
     if self._ending is None:
@@ -288,21 +287,21 @@ class SentenceEndingUnification(Instruction):
     return self._description_pattern.format(ending=self._ending)
   
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return {"ending": self._ending}
   
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return ["ending"]
 
   def check_following(self, value):
-    """Checks if all sentence endings are in the specified form.
+    """全ての文末が指定した形になっているか確認します。
 
     Args:
-      value: A string representing the response.
+      value: 応答を表す文字列。
 
     Returns:
-      True if all the sentence endings follow the instruction; otherwise False.
+      文末が指示に従っている場合は True、それ以外は False。
     """
     quote_pattern_1 = re.compile(r'「.*?」')
     quote_pattern_2 = re.compile(r'『.*?』')
@@ -320,17 +319,16 @@ class SentenceEndingUnification(Instruction):
   
 
 class NominalEndingChecker(Instruction):
-  """Check the nominal endings in the response"""
+  """体言止めが指定された回数以上使用されているか確認します。"""
 
   def build_description(self, *, count=None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      count: An integer specifying the exact number of nominal endings
-        that is required to appear in the response.
-    
+      count: 体言止めの使用回数を表す整数。
+
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     self._count = count 
     if self._count is None or self._count < 0:
@@ -339,21 +337,21 @@ class NominalEndingChecker(Instruction):
     return self._description_pattern.format(count = self._count)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return {"count": self._count}
   
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return ["count"]
   
   def check_following(self, value):
-    """Checks if the number of nominal endings meets the requirement.
+    """体言止めが指示に従った回数使用されているか確認します。
 
     Args:
-      value: A string representing the response.
+      value: 応答を表す文字列。
 
     Returns:
-      True if the actual number of nominal endings meets the minimum requirement; otherwise False.
+      体言止めの使用回数が指示に従っている場合は True、それ以外は False。
     """
     quote_pattern_1 = re.compile(r'「.*?」')
     quote_pattern_2 = re.compile(r'『.*?』')
@@ -372,41 +370,40 @@ class NominalEndingChecker(Instruction):
 
 
 class KanjiNumberNotationChecker(Instruction):
-  """Check all numbers written in kanji."""
+  """数字が全て漢数字で表記されているか確認します。"""
 
   def build_description(self):
-    """Build the instruction description."""
+    """指示文を作成します。"""
     self._description_pattern = "数字を全て漢数字で表記する"
     return self._description_pattern
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return None
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return []
   
   def check_following(self, value):
-    """Checks if all numbers are written in kanji."""
+    """数字が全て漢数字で表記されているか確認します。"""
     return not re.search(r'\d', value)
 
 
 class ResponseLanguageChecker(Instruction):
-  """Check the language of the entire response."""
+  """応答の言語を確認します。"""
 
   def build_description(self, *, language = None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      language: A string representing the expected language of the response. The
-        language has to comply to the 97 types defined in
-        `langid.py` (https://pypi.org/project/langid/1.1.5/), which follows
-        ISO 639-1 codes (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes);
-        for example, `en` for English, `zh` for Chinese, `fr` for French.
+      language: 応答に要求する言語を表す文字列。
+        例えば、英語の場合は `en`、中国語の場合は `zh`、フランス語の場合は `fr` のように、
+        ISO 639-1 コード (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) に従って記された
+        `langid.py` (https://pypi.org/project/langid/1.1.5/) で定義された97種類のいずれかから言語は選んでください。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     self._language = language
     if self._language is None:
@@ -417,21 +414,21 @@ class ResponseLanguageChecker(Instruction):
     return self._description_pattern.format(language=_LANGUAGES[self._language])
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return {"language": self._language}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return ["language"]
 
   def check_following(self, value):
-    """Check if the language of the entire response follows the instruction.
+    """応答の全体の言語が指示に従っているか確認します。
 
     Args:
-      value: A string representing the response.
+      value: 応答を表す文字列。
 
     Returns:
-      True if the language of `value` follows instruction; otherwise False.
+      `value` の言語が指示に従っている場合は True、それ以外の場合は False。
     """
     assert isinstance(value, str)
 
@@ -440,41 +437,34 @@ class ResponseLanguageChecker(Instruction):
     except langdetect.LangDetectException as e:
       # Count as instruction is followed.
       logging.error(
-          "Unable to detect language for text %s due to %s", value, e
+          "「%s」の言語を検出できませんでした。\n原因: %s ", value, e
       )  # refex: disable=pytotw.037
       return True
 
 
 class NumberOfSentences(Instruction):
-  """Check the number of sentences."""
+  """応答に含まれる文の数を確認します。"""
 
   def build_description(self, *, num_sentences = None,
                         relation = None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      num_sentences: An integer specifying the number of sentences as a
-        threshold.
-      relation: A string in (`less than`, `at least`), defining the relational
-        operator for comparison.
-        Two relational comparisons are supported for now:
-        if 'less than', the actual number of sentences < the threshold;
-        if 'at least', the actual number of sentences >= the threshold.
+      num_sentences: 閾値として指定する文の数を表す整数。
+      relation: 比較のための関係演算子を定義する文字列（`未満` または `以上`）。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     # The number of sentences as a threshold for comparison.
     self._num_sentences_threshold = num_sentences
-    if (self._num_sentences_threshold is None or
-        self._num_sentences_threshold < 0):
+    if (self._num_sentences_threshold is None or self._num_sentences_threshold < 0):
       self._num_sentences_threshold = random.randint(1, _MAX_NUM_SENTENCES)
 
     if relation is None:
       self._comparison_relation = random.choice(_COMPARISON_RELATION)
     elif relation not in _COMPARISON_RELATION:
-      raise ValueError("The supported relation for comparison must be in "
-                       f"{_COMPARISON_RELATION}, but {relation} is given.")
+      raise ValueError(f"サポートされている比較の関係は {_COMPARISON_RELATION} のいずれかである必要がありますが、{relation} が指定されました。")
     else:
       self._comparison_relation = relation
 
@@ -485,26 +475,22 @@ class NumberOfSentences(Instruction):
         num_sentences=self._num_sentences_threshold)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return {"num_sentences": self._num_sentences_threshold,
             "relation": self._comparison_relation}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return ["num_sentences", "relation"]
 
   def check_following(self, value):
-    """Check if the number of sentences follows the instruction.
+    """文の数が指示に従っているかを確認します。
 
     Args:
-      value: A string representing the response.
+      value: 回答を表す文字列。
 
     Returns:
-      True if the response follows the instruction.
-
-    Raise:
-        ValueError if the string in `instruction_args` is not in
-        [`less_than`, `at_least`].
+      回答が指示に従っている場合は True。
     """
     num_sentences = instructions_util.count_sentences(value)
     if self._comparison_relation == _COMPARISON_RELATION[0]:
@@ -514,17 +500,16 @@ class NumberOfSentences(Instruction):
 
 
 class PlaceholderChecker(Instruction):
-  """Check the placeholders in template writing."""
+  """テンプレートを記述する際に適切な数のプレースホルダーを含められるか確認します。"""
 
   def build_description(self, *, num_placeholders = None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      num_placeholders: An integer denoting the minimum number of
-        placeholders required in the response.
+      num_placeholders: 応答に必要なプレースホルダーの最小数を示す整数。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     self._num_placeholders = num_placeholders
     if self._num_placeholders is None or self._num_placeholders < 0:
@@ -536,22 +521,21 @@ class PlaceholderChecker(Instruction):
         num_placeholders=self._num_placeholders)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return {"num_placeholders": self._num_placeholders}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return ["num_placeholders"]
 
   def check_following(self, value):
-    """Check if the number of placeholders follows the instruction.
+    """プレースホルダーの数が指示に従っているか確認します。
 
     Args:
-      value: A string representing the response.
+      value: 応答を表す文字列。
 
     Returns:
-      True if the actual number of placeholders in the response is greater than
-      or equal to `num_placeholders`; otherwise, False.
+      実際のプレースホルダーの数が `num_placeholders` 以上であれば True、それ以外は False。
     """
     placeholders = re.findall(r"\[.*?\]", value)
     num_placeholders = len(placeholders)
@@ -559,47 +543,44 @@ class PlaceholderChecker(Instruction):
 
 
 class BulletListChecker(Instruction):
-  """Checks the bullet list in the prompt."""
+  """応答が箇条書きで書かれているか確認します。"""
 
   def build_description(self, *, num_bullets = None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      num_bullets: An integer specifying the exact number of bullet lists
-        that is required to appear in the response.
+      num_bullets: 応答に含めるべき箇条書きの数を指定する整数。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     self._num_bullets = num_bullets
     if self._num_bullets is None or self._num_bullets < 0:
       self._num_bullets = random.randint(1, _NUM_BULLETS)
     self._description_pattern = (
         "応答はちょうど {num_bullets} 個の箇条書きで構成してください。 " +
-        "以下のような箇条書きの形を使用してください:\n" +
+        "以下のような箇条書きの形を参考にしてください:\n" +
         "・一つめの内容\n" +
         "・二つめの内容")
     return self._description_pattern.format(
         num_bullets=self._num_bullets)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return {"num_bullets": self._num_bullets}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return ["num_bullets"]
 
   def check_following(self, value):
-    r"""Check if the number of bullet lists meets the requirement.
+    r"""箇条書きの数が要件を満たしているかをチェックします。
 
     Args:
-      value: A string representing the response. The response is expected to
-        contain some bullet lists that start with `・`.
+      value: 応答を表す文字列。応答には `・` で始まる箇条書きが含まれていることが期待されます。
 
     Returns:
-      True if the actual number of bullet lists in the response meets the
-      requirement.
+      実際の箇条書きの数が要件を満たしている場合は True を返します。
     """
     bullet_lists = re.findall(r"^\s*・[^\・].*$", value, flags=re.MULTILINE)
     num_bullet_lists = len(bullet_lists)
@@ -607,17 +588,16 @@ class BulletListChecker(Instruction):
 
 
 class NumberedListChecker(Instruction):
-  """Checks the numbered list in the prompt."""
+  """応答が数字のリストで書かれているか確認します。"""
 
   def build_description(self, *, num_items = None):
-    """Build the instruction description.
+    """指示文を作成します。
 
-    Args:
-      num_bullets: An integer specifying the exact number of numbered lists
-        that is required to appear in the response.
+    引数:
+      num_items: 応答に含めるべき番号付きリストの数を指定する整数。
 
-    Returns:
-      A string representing the instruction description.
+    戻り値:
+      指示文を表す文字列。
     """
     self._num_items = num_items
     if self._num_items is None or self._num_items < 0:
@@ -631,22 +611,21 @@ class NumberedListChecker(Instruction):
         num_items=self._num_items)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return {"num_items": self._num_items}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return ["num_items"]
 
   def check_following(self, value):
-    r"""Check if the number of numbered lists meets the requirement.
+    r"""番号付きリストの数が要件を満たしているかをチェックします。
 
-    Args:
-      value: A string representing the response. The response is expected to
-        contain some numbered lists that start with `1.`.
+    引数:
+      value: 応答を表す文字列。応答には `1. ` で始まる番号付きリストが含まれていることが期待されます。
 
-    Returns:
-      A string representing the instruction description.
+    戻り値:
+      実際の番号付きリストの数が要件を満たしている場合は True を返します。
     """
     numbered_lists = re.findall(r"^\s*\d+\.\s.*$", value, flags=re.MULTILINE)
     num_numbered_lists = len(numbered_lists)
@@ -654,33 +633,31 @@ class NumberedListChecker(Instruction):
   
 
 class ConstrainedResponseChecker(Instruction):
-  """Checks the constrained response."""
+  """指定された応答を返すか確認します。"""
 
   def build_description(self):
-    """Build the instruction description."""
-    # A sequence of string(s) representing the options of the expected response.
+    """指示文を作成します。"""
     self._constrained_responses = _CONSTRAINED_RESPONSE_OPTIONS
     self._description_pattern = ("次の選択肢のいずれかで回答してください: {response_options}")
     return self._description_pattern.format(
         response_options=self._constrained_responses)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description`のキーワード引数を返します。"""
     return None
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return []
 
   def check_following(self, value):
-    """Checks if the response matches the constrained options.
+    """指定された選択肢の中から応答が選ばれたかを確認します。
 
     Args:
-      value: A string representing the response.
+      value: 応答を表す文字列。
 
     Returns:
-      True if the actual response contains one of the options in the constrained
-      responses; otherwise False.
+      実際の応答が指定された選択肢のいずれかを含む場合はTrue、それ以外の場合はFalseを返します。
     """
     value = value.strip()
     for constrained_response in self._constrained_responses:
@@ -690,17 +667,16 @@ class ConstrainedResponseChecker(Instruction):
 
 
 class ConstrainedStartChecker(Instruction):
-  """Checks the response start."""
+  """応答の書き始めを確認します。"""
 
   def build_description(self, *, starter = None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      starter: A string representing the keyward that the response should start
-        with.
+      starter: 応答の書き始めを示すキーワードを表す文字列。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     self._starter = starter.strip() if isinstance(starter, str) else starter
     if self._starter is None:
@@ -709,22 +685,22 @@ class ConstrainedStartChecker(Instruction):
     return self._description_pattern.format(starter=self._starter)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description`のキーワード引数を返します。"""
     return {"starter": self._starter}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数のキーを返します。"""
     return ["starter"]
 
   def check_following(self, value):
-    """Checks if the response starts with the constrained keyword or phrase.
+    """応答が指定されたキーワードやフレーズで始まっているかをチェックします。
 
     Args:
-      value: A string representing the response.
+      value: 応答を表す文字列。
 
     Returns:
-      True if the response starts with the given phrase or keyword that is
-      contained in `instruction_args`; otherwise, False.
+      応答が`instruction_args`に含まれるフレーズやキーワードで始まっている場合はTrue、
+      そうでない場合はFalse。
     """
     response_pattern = r"^\s*" + self._starter + r".*$"
     response_with_constrained_start = re.search(response_pattern, value,
@@ -733,17 +709,16 @@ class ConstrainedStartChecker(Instruction):
 
 
 class HighlightSectionChecker(Instruction):
-  """Checks the highlighted section."""
+  """ハイライトされたセクションの数をチェックします。"""
 
   def build_description(self, *, num_highlights = None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      num_highlights: An integer specifying the minimum number of highlighted
-        sections.
+      num_highlights: ハイライトされたセクションの数を指定する整数。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     self._num_highlights = num_highlights
     if self._num_highlights is None or self._num_highlights < 0:
@@ -755,23 +730,21 @@ class HighlightSectionChecker(Instruction):
     return self._description_pattern.format(num_highlights=self._num_highlights)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description`のキーワード引数を返します。"""
     return {"num_highlights": self._num_highlights}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return ["num_highlights"]
 
   def check_following(self, value):
-    """Checks if the number of highlighted sections meets the requirement.
+    """指定された数以上のセクションが強調されているか確認します。
 
     Args:
-      value: a string repesenting the response. The response is expected to
-        contain highlighted sections in the format of *highlighted*.
+      value: 回答を表す文字列。回答は《》で囲まれた強調されたセクションを有していることが期待されます。
 
     Returns:
-      True if the actual number of highlighted sections in the format of
-      《highlighed sections》 meets the minimum requirement; otherwise False.
+      回答内の強調されたセクションの数が最小セクション数以上であればTrue、それ以外はFalse。
     """
     num_highlights = 0
     highlights = re.findall(r"《[^\n《》]*》", value)
@@ -783,19 +756,18 @@ class HighlightSectionChecker(Instruction):
 
 
 class SectionChecker(Instruction):
-  """Checks the sections."""
+  """セクションの数をチェックします。"""
 
   def build_description(self, *, section_spliter = None,
                         num_sections = None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      section_spliter: A string represents the section spliter keyword that
-        marks a new section, i.e., `章` or `節`.
-      num_sections: An integer specifying the number of sections.
+      section_spliter: 「章」や「節」などの新しいセクションの始まりを示すキーワードを表す文字列。
+      num_sections: セクションの数を指定する整数。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     self._section_spliter = section_spliter.strip() if isinstance(
         section_spliter, str) else section_spliter
@@ -819,26 +791,23 @@ class SectionChecker(Instruction):
         section_spliter=self._section_spliter)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description`のキーワード引数を返します。"""
     return {"section_spliter": self._section_spliter,
             "num_sections": self._num_sections}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return ["section_spliter", "num_sections"]
 
   def check_following(self, value):
-    """Checks the response contains multiple sections.
+    """回答が複数のセクションで構成されているか確認します。
 
     Args:
-      value: A string representing the response. The response is expected
-        to contain multiple sections (number of sections is greater than 1).
-        A new section starts with `第１章`, where the number denotes the
-        section index.
+      value: 回答を表す文字列。回答は1より大きい複数のセクションで構成されていることが期待されます。
+        新しいセクションは`第１章`のようにセクション番号で始まります。
 
     Returns:
-      True if the number of sections in the response is greater than or equal to
-      the minimum number of sections; otherwise, False.
+      回答のセクション数が最小セクション数以上であればTrue、それ以外はFalse。
     """
     section_splitter_patten = r"第[\d\uFF10-\uFF19]+章"
     sections = re.split(section_splitter_patten, value)
@@ -847,16 +816,16 @@ class SectionChecker(Instruction):
 
 
 class ParagraphChecker(Instruction):
-  """Checks the paragraphs."""
+  """段落の数を確認します。"""
 
   def build_description(self, *, num_paragraphs = None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      num_paragraphs: An integer specifying the number of paragraphs.
+      num_paragraphs: 段落の数を指定する整数。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     self._num_paragraphs = num_paragraphs
     if self._num_paragraphs is None or self._num_paragraphs < 0:
@@ -868,23 +837,22 @@ class ParagraphChecker(Instruction):
     return self._description_pattern.format(num_paragraphs=self._num_paragraphs)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description`のキーワード引数を返します。"""
     return {"num_paragraphs": self._num_paragraphs}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return ["num_paragraphs"]
 
   def check_following(self, value):
-    """Checks the response contains required number of paragraphs.
+    """応答が必要な段落数を含んでいるかを確認します。
 
     Args:
-      value: A string representing the response. The response may contain
-        paragraphs that are separated by the markdown divider: `***`.
+      value: 応答を表す文字列。応答にはマークダウンの区切り記号: `***` で区切られた段落が含まれていることが期待されます。
+
 
     Returns:
-      True if the actual number of paragraphs is the same as required;
-      otherwise, False.
+      実際の段落数が要求された数と同じ場合はTrue、それ以外の場合はFalse。
     """
     paragraphs = re.split(r"\s?\*\*\*\s?", value)
     num_paragraphs = len(paragraphs)
@@ -900,17 +868,16 @@ class ParagraphChecker(Instruction):
 
 
 class PostscriptChecker(Instruction):
-  """Checks the postscript."""
+  """追伸が含まれているか確認します。"""
 
   def build_description(self, *, postscript_marker = None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      postscript_marker: A string containing the keyword that marks the start
-        of the postscript section.
+      postscript_marker: 追伸の開始を示すキーワードを含む文字列。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     self._postscript_marker = postscript_marker.strip() if isinstance(postscript_marker, str) else postscript_marker
     if self._postscript_marker is None:
@@ -918,27 +885,24 @@ class PostscriptChecker(Instruction):
 
     self._description_pattern = ("応答の最後に、{postscript}で始まる追伸を追加してください。")
 
-
     return self._description_pattern.format(postscript=self._postscript_marker)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description`のキーワード引数を返します。"""
     return {"postscript_marker": self._postscript_marker}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return ["postscript_marker"]
 
   def check_following(self, value):
-    """Checks if the response follows the postscript format.
+    """応答が追伸形式に従っているかを確認します。
 
     Args:
-      value: a string representing the response. The response is expected to
-        contain a postscript section.
+      value: 応答を表す文字列。応答には追伸セクションが含まれていることが期待されます。
 
     Returns:
-      True if the response contains a postscript section starting with
-      the keyword containing in the `instruction_args`; otherwise False.
+      応答が`instruction_args`に含まれるキーワードで始まる追伸セクションを含んでいる場合はTrue、それ以外の場合はFalse。
     """
     if self._postscript_marker == "P.P.S":
       postscript_pattern = r"\s*p\.\s?p\.\s?s.*$"
@@ -951,52 +915,47 @@ class PostscriptChecker(Instruction):
 
 
 class RephraseChecker(Instruction):
-  """Checks the repharse."""
+  """指定した箇所を言い換えしているかを確認します。"""
 
   def build_description(self, *, original_message):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      original_message: A string representing the original message. The
-        rephrased response should only change its words/sentences in between
-        its two curly brackets, for example, {change me}. Both original and rephrased
-        messages should contain the changes in the form of {change me}.
+      original_message: 元のメッセージを表す文字列。言い換えた応答は、波括弧で囲まれた部分のみを変更させます。
+        例えば、{ここを変更} のように。元のメッセージと再構成されたメッセージの両方に、{ここを変更} の形式で変更が含まれている必要があります。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     if not self.is_change(original_message):
-      raise ValueError(f"Message {original_message} does not contain changes "
-                       "in the form of {change me}.")
+      raise ValueError(f"メッセージ {original_message} には {{ここを変更}} の形式で変更が含まれていません。")
+
 
     self._reference_without_change = original_message
     self._description = ("例えば {ここを変更} のように、元の文章を波括弧で囲まれた部分のみを変更して応答してください")
-
     return self._description
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description`のキーワード引数を返します。"""
     return {"original_message": self._reference_without_change}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return ["original_message"]
 
   def check_following(self, value):
-    r"""Checks if the rephrasing follows the instruction.
+    r"""指示に従って言い換えられているか確認します。
 
     Args:
-      value: A string representing the response, which is expected to rephras
-        the string of `instruction_args`.
+      value: 応答を表す文字列で、`instruction_args`の文字列を言い換えたものが期待されます。
 
     Returns:
-      True if `value` and `instruction_args` only differ by the words/sentences
-      in between two asterisks such as *change me*; otherwise, False.
+      `value`と`instruction_args`が波括弧で囲まれた部分のみ異なる場合はTrue、それ以外の場合はFalseを返します。
     """
 
     if not self.is_change(value):
-      raise ValueError(f"value {value} does not contain "
-                       "changes in the form of {change me}.")
+      raise ValueError(f"value {value} には {{ここを変更}} の形式で変更が含まれていません。")
+
 
     response_without_changes = self.strip_changes(value)
     reference_without_changes = self.strip_changes(
@@ -1005,26 +964,25 @@ class RephraseChecker(Instruction):
     return response_without_changes == reference_without_changes
 
   def is_change(self, response):
-    """Check if there is change in the response in the form of *change me*."""
+    """応答に {ここを変更} の形式で変更が含まれているか確認します。"""
     return re.search(r"\{.*\}", response)
 
   def strip_changes(self, response):
-    """Strips off the changes."""
+    """変更部分を取り除きます。"""
     return re.sub(r"\{.*\}", "", response)
 
 
 class KeywordChecker(Instruction):
-  """Check the exisitence of certain keywords."""
+  """キーワードが含まれているか確認します。"""
 
   def build_description(self, *, keywords = None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      keywords: A sequence of strings representing the keywords that are
-        expected in the response.
+      keywords: 応答に含まれるべきキーワードの文字列のシーケンス。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
 
     if not keywords:
@@ -1038,15 +996,15 @@ class KeywordChecker(Instruction):
     return self._description_pattern.format(keywords=self._keywords)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description`のキーワード引数を返します。"""
     return {"keywords": self._keywords}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return ["keywords"]
 
   def check_following(self, value):
-    """Check if the response contain the expected keywords."""
+    """応答に要求したキーワードが含まれているか確認します。"""
     for keyword in self._keywords:
       if not re.search(keyword, value):
         return False
@@ -1054,25 +1012,20 @@ class KeywordChecker(Instruction):
 
 
 class KeywordFrequencyChecker(Instruction):
-  """Check the keyword frequency."""
+  """キーワードの出現頻度を確認します。"""
 
   def build_description(self, *, keyword = None,
                         frequency = None,
                         relation = None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      keyword: A string representing a keyword that is expected in the response.
-      frequency: An integer specifying the number of times `keyword` is expected
-        to appear in the response.
-      relation: A string in (`less than`, `at least`), defining the relational
-        operator for comparison.
-        Two relational comparisons are supported for now:
-        if 'less than', the actual number of occurrences < frequency;
-        if 'at least', the actual number of occurrences >= frequency.
+      keyword: 応答に含むよう要求したキーワードを表す文字列。
+      frequency: `keyword` が応答全体に出現することが期待される回数を指定する整数。
+      relation: 比較のための関係演算子を定義する文字列 (`未満`, `以上`)。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     if not keyword:
       self._keyword = instructions_util.generate_keywords(num_keywords=1)[0]
@@ -1086,8 +1039,8 @@ class KeywordFrequencyChecker(Instruction):
     if relation is None:
       self._comparison_relation = random.choice(_COMPARISON_RELATION)
     elif relation not in _COMPARISON_RELATION:
-      raise ValueError("The supported relation for comparison must be in "
-                       f"{_COMPARISON_RELATION}, but {relation} is given.")
+      raise ValueError("サポートされている比較のための関係演算子は "
+                       f"{_COMPARISON_RELATION} のいずれかでなければなりませんが、{relation} が指定されました。")
     else:
       self._comparison_relation = relation
 
@@ -1100,17 +1053,17 @@ class KeywordFrequencyChecker(Instruction):
         frequency=self._frequency)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return {"keyword": self._keyword,
             "frequency": self._frequency,
             "relation": self._comparison_relation}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return ["keyword", "frequency", "relation"]
 
   def check_following(self, value):
-    """Checks if the response contain the keyword with required frequency."""
+    """応答が指定した回数キーワードを含んでいるか確認します。"""
     actual_occurrences = len(re.findall(self._keyword, value))
 
     if self._comparison_relation == _COMPARISON_RELATION[0]:
@@ -1120,22 +1073,20 @@ class KeywordFrequencyChecker(Instruction):
 
 
 class NumberOfLetters(Instruction):
-  """Checks the number of letters."""
+  """文字数を確認します。"""
 
   def build_description(self, *, num_letters=None, relation=None):
-    """Build the instruction description.
+    """指示文を作成する。
 
     Args:
-      num_letters: An integer specifying the number of letters contained in the
-        response.
-      relation: A string in (`less than`, `at least`), defining the relational
-        operator for comparison.
-        Two relational comparisons are supported for now:
-        if 'less than', the actual number of words < num_words;
-        if 'at least', the actual number of words >= num_words.
+      num_letters: 応答に含まれる文字数を指定する整数。
+      relation: 比較のための関係演算子を定義する文字列（`未満` または `以上`）。
+        現在サポートされている関係演算子は2つ:
+        '未満' の場合、実際の文字数 < num_letters;
+        '以上' の場合、実際の文字数 >= num_letters。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
 
     self._num_letters = num_letters
@@ -1147,8 +1098,8 @@ class NumberOfLetters(Instruction):
     if relation is None:
       self._comparison_relation = random.choice(_COMPARISON_RELATION)
     elif relation not in _COMPARISON_RELATION:
-      raise ValueError("The supported relation for comparison must be in "
-                       f"{_COMPARISON_RELATION}, but {relation} is given.")
+      raise ValueError("サポートされている比較の関係は "
+                       f"{_COMPARISON_RELATION} のいずれかでなければなりませんが、{relation} が指定されました。")
     else:
       self._comparison_relation = relation
 
@@ -1160,16 +1111,16 @@ class NumberOfLetters(Instruction):
         num_letters=self._num_letters)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return {"num_letters": self._num_letters,
             "relation": self._comparison_relation}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return ["num_letters", "relation"]
 
   def check_following(self, value):
-    """Checks if the response contains the expected number of letters."""
+    """応答が指定した文字数を含んでいるかをチェックします。"""
     num_letters = len(value)
 
     if self._comparison_relation == _COMPARISON_RELATION[0]:
@@ -1179,7 +1130,7 @@ class NumberOfLetters(Instruction):
 
 
 class JsonFormat(Instruction):
-  """Check the Json format."""
+  """JSON形式かどうかを確認します。"""
 
   def build_description(self):
     self._description_pattern = (
@@ -1188,11 +1139,11 @@ class JsonFormat(Instruction):
     return self._description_pattern
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description`のキーワード引数を返します。"""
     return None
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return []
 
   def check_following(self, value):
@@ -1213,23 +1164,21 @@ class JsonFormat(Instruction):
 
 
 class ParagraphFirstWordCheck(Instruction):
-  """Check the paragraph and the first word of the nth paragraph."""
+  """段落の数とn番目の段落の最初の単語を確認します。"""
 
   def build_description(self, num_paragraphs = None,
                         nth_paragraph = None,
                         first_word = None):
-    r"""Build the instruction description.
+    r"""指示文を作成します。
 
     Args:
-      num_paragraphs: An integer indicating the number of paragraphs expected
-        in the response. A paragraph is a subset of the string that is
-        expected to be separated by '\n\n'.
-      nth_paragraph: An integer indicating the paragraph number that we look at.
-        Note that n starts from 1.
-      first_word: A string that represent the first word of the bth paragraph.
+      num_paragraphs: 応答に要求する段落の数を示す整数。段落は文字列の一部であり、
+        '\n\n' で区切られるよう要求します。
+      nth_paragraph: 注目すべき段落の番号を示す整数。nは1から始まります。
+      first_word: n番目の段落の最初の単語を表す文字列。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     self._num_paragraphs = num_paragraphs
     if self._num_paragraphs is None or self._num_paragraphs < 0:
@@ -1246,7 +1195,6 @@ class ParagraphFirstWordCheck(Instruction):
     self._first_word = first_word
     if self._first_word is None:
       self._first_word = instructions_util.generate_keywords(num_keywords=1)[0]
-    self._first_word = self._first_word.lower()
 
     self._description_pattern = (
         "{num_paragraphs}個の段落に分けて応答を書いてください。 " +
@@ -1259,26 +1207,24 @@ class ParagraphFirstWordCheck(Instruction):
         first_word=self._first_word)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return {"num_paragraphs": self._num_paragraphs,
             "nth_paragraph": self._nth_paragraph,
             "first_word": self._first_word}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return ["num_paragraphs", "nth_paragraph", "first_word"]
 
   def check_following(self, value):
-    """Checks for required number of paragraphs and correct first word.
+    """総段落数と指定した箇所の書き初めの単語が正しいかを確認します。
 
     Args:
-      value: a string representing the response. The response may contain
-        paragraphs that are separated by two new lines and the first word of
-        the nth paragraph will have to match a specified word.
+      value: 応答の内容を表す文字列。応答は段落で構成されており、それぞれ2つの改行で区切られている必要があります。
+        n番目の段落の最初の単語は指定された単語と一致する必要があります。
 
     Returns:
-      True if the number of paragraphs is the same as required and the first
-      word of the specified paragraph is the same as required. Otherwise, false.
+      段落の数が要求通りであり、指定された段落の最初の単語が要求通りであればTrue。それ以外はFalse。
     """
 
     paragraphs = re.split(r"\n\n", value)
@@ -1365,18 +1311,17 @@ class ParagraphFirstWordCheck(Instruction):
 
 
 class ForbiddenWords(Instruction):
-  """Checks that specified words are not used in response."""
+  """指定された単語が応答に含まれていないことを確認します。"""
 
   def build_description(self, forbidden_words = None
                         ):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      forbidden_words: A sequences of strings respresenting words that are not
-        allowed in the response.
+      forbidden_words: 応答に含めてはいけない単語のリスト。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
 
     if not forbidden_words:
@@ -1394,39 +1339,35 @@ class ForbiddenWords(Instruction):
     )
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description` のキーワード引数を返します。"""
     return {"forbidden_words": self._forbidden_words}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description` の引数キーを返します。"""
     return ["forbidden_words"]
 
   def check_following(self, value):
-    """Check if the response does not contain the expected keywords."""
+    """応答に指定されたキーワードが含まれていないかを確認します。"""
     for word in self._forbidden_words:
       if re.search(word, value):
         return False
     return True
 
 
-from janome.tokenizer import Tokenizer
 class RephraseParagraph(Instruction):
-  """Checks that the paragraph is rephrased."""
+  """文章が言い換えられていることを確認するクラス。"""
 
-  def build_description(self, *, original_paragraph, low, high
-                        ):
-    """Builds the instruction description.
+  def build_description(self, *, original_paragraph, low, high):
+    """指示文を作成する。
 
     Args:
-      original_paragraph: A string presenting the original paragraph. The
-        rephrases response should have betweeb low-high words in common.
-      low: An integer presenting the lower bound of similar words.
-      high: An integer representing the upper bound of similar words.
+      original_paragraph: 元の文章を表す文字列。
+      low: 含めるべき同じ単語の最小数を表す整数。
+      high: 含めるべき同じ単語の最大数を表す整数。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
-    # TODO(jeffrey) make more encompassing
     self._original_paragraph = original_paragraph
     self._low = low
     self._high = high
@@ -1443,13 +1384,13 @@ class RephraseParagraph(Instruction):
                                     low=self._low, high=self._high)
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description`のキーワード引数を返します。"""
     return {"original_paragraph": self._original_paragraph,
             "low": self._low,
             "high": self._high}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return ["original_paragraph", "low", "high"]
 
   def check_following(self, value):
@@ -1466,36 +1407,36 @@ class RephraseParagraph(Instruction):
 
     return similar_words >= self._low and similar_words <= self._high
 
-
+  
 class TwoResponsesChecker(Instruction):
-  """Check that two responses were given."""
+  """2種類の応答があることを確認します。"""
 
   def build_description(self):
-    """Build the instruction description."""
+    """指示文を作成します。"""
     self._description_pattern = (
         "2種類の異なる応答をしてください。それぞれの応答は全角のダッシュ記号6つ（ーーーーーー）で区切ってください。"
     )
     return self._description_pattern
 
   def get_instruction_args(self):
-    """Returns the keyward args of `build_description`."""
+    """`build_description`のキーワード引数を返します。"""
     return None
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return []
 
   def check_following(self, value):
-    """Checks if the response has two different answers.
+    """応答が2つの異なる答えを含んでいるかを確認します。
 
     Args:
-      value: A string representing the response.
+      value: 応答を表す文字列。
 
     Returns:
-      True if two responses are detected and false otherwise.
+      2つの応答が検出された場合はTrue、それ以外の場合はFalse。
     """
     valid_responses = list()
-    responses = value.split("******")
+    responses = value.split("ーーーーーー")
     for index, response in enumerate(responses):
       if not response.strip():
         if index != 0 and index != len(responses) - 1:
@@ -1509,19 +1450,19 @@ class TwoResponsesChecker(Instruction):
 
 
 class RepeatPromptThenAnswer(Instruction):
-  """Checks that Prompt is first repeated then answered."""
+  """最初にリクエストを繰り返し、その後に答えることを確認します。"""
 
   def build_description(self, *, prompt_to_repeat = None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      prompt_to_repeat: The prompt that is meant to be repeated.
+      prompt_to_repeat: 繰り返すべきプロンプト。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     if not prompt_to_repeat:
-      raise ValueError("prompt_to_repeat must be set.")
+      raise ValueError("prompt_to_repeatを設定する必要があります。")
     else:
       self._prompt_to_repeat = prompt_to_repeat
     self._description_pattern = (
@@ -1531,11 +1472,11 @@ class RepeatPromptThenAnswer(Instruction):
     return self._description_pattern
 
   def get_instruction_args(self):
-    """Returns the keyword args of build description."""
+    """`build_description`のキーワード引数を返します。"""
     return {"prompt_to_repeat": self._prompt_to_repeat}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return ["prompt_to_repeat"]
 
   def check_following(self, value):
@@ -1545,16 +1486,16 @@ class RepeatPromptThenAnswer(Instruction):
 
 
 class EndChecker(Instruction):
-  """Checks that the prompt ends with a given phrase."""
+  """応答が指定されたフレーズで終わることをチェックします。"""
 
   def build_description(self, *, end_phrase = None):
-    """Build the instruction description.
+    """指示文を作成します。
 
     Args:
-      end_phrase: A string representing the phrase the response should end with.
+      end_phrase: 応答が最後に出力すべきフレーズを表す文字列
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     self._end_phrase = (
         end_phrase.strip() if isinstance(end_phrase, str) else end_phrase
@@ -1567,40 +1508,40 @@ class EndChecker(Instruction):
     return self._description_pattern.format(ender=self._end_phrase)
 
   def get_instruction_args(self):
-    """Returns the keyword args of build description."""
+    """`build_description`のキーワード引数を返します。"""
     return {"end_phrase": self._end_phrase}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return ["end_phrase"]
 
   def check_following(self, value):
-    """Checks if the response ends with the expected phrase."""
-    value = value.strip().strip("\"").lower()
-    self._end_phrase = self._end_phrase.strip().lower()
+    """応答が指定したフレーズで終わっているかをチェックします。"""
+    value = value.strip().strip("\"")
+    self._end_phrase = self._end_phrase.strip()
     return value.endswith(self._end_phrase)
 
-  
+
 class TitleChecker(Instruction):
-  """Checks the response for a title."""
+  """応答にタイトルが含まれているかをチェックします。"""
 
   def build_description(self):
-    """Build the instruction description."""
+    """指示文を作成します。"""
     self._description_pattern = (
         "例えば『喜びの詩』のように、応答に二重山括弧で囲まれたタイトルをつけてください。"
     )
     return self._description_pattern
 
   def get_instruction_args(self):
-    """Returns the keyword args of build description."""
+    """`build_description`のキーワード引数を返します。"""
     return None
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return []
 
   def check_following(self, value):
-    """Checks if the response contains a title."""
+    """応答にタイトルが含まれているかをチェックします。"""
     pattern = r"『[^』]+』"
     re_pattern = re.compile(pattern)
     titles = re.findall(re_pattern, value)
@@ -1611,32 +1552,25 @@ class TitleChecker(Instruction):
     return False
 
 
-class LetterFrequencyChecker(Instruction):
-  """Checks letter frequency."""
+class LetterFrequencyChecker:
+  """文字の出現頻度をチェックします"""
 
-  def build_description(self, *, letter = None,
-                        let_frequency = None,
-                        let_relation = None):
-    """Build the instruction description.
+  def build_description(self, *, letter=None, let_frequency=None, let_relation=None):
+    """指示文を作成します。
 
     Args:
-      letter: A string representing a letter that is expected in the response.
-      let_frequency: An integer specifying the number of times `keyword` is
-        expected to appear in the response.
-      let_relation: A string in (`less than`, `at least`), defining the
-        relational operator for comparison. Two relational comparisons are
-        supported for now; if 'less than', the actual number of
-        occurrences < frequency; if 'at least', the actual number of
-        occurrences >= frequency.
+      letter: 出現回数を数える文字を表す文字列。
+      let_frequency: `letter`が回答に出現する回数を指定する整数。
+      let_relation: 比較のための関係演算子を定義する文字列（`未満`, `以上`）。
 
     Returns:
-      A string representing the instruction description.
+      指示文を表す文字列。
     """
     if not letter or len(letter) > 1 or not ('ぁ' <= letter <= 'ん'):
       self._letter = random.choice([chr(i) for i in range(ord('ぁ'), ord('ん') + 1)])
     else:
       self._letter = letter.strip()
-
+      
     self._frequency = let_frequency
     if self._frequency is None or self._frequency < 0:
       self._frequency = random.randint(1, _LETTER_FREQUENCY)
@@ -1645,8 +1579,8 @@ class LetterFrequencyChecker(Instruction):
       self._comparison_relation = random.choice(_COMPARISON_RELATION)
     elif let_relation not in _COMPARISON_RELATION:
       raise ValueError(
-          "The supported relation for comparison must be in "
-          f"{_COMPARISON_RELATION}, but {let_relation} is given."
+          "サポートされている比較の関係は "
+          f"{_COMPARISON_RELATION} のいずれかでなければなりませんが、{let_relation} が指定されました。"
       )
     else:
       self._comparison_relation = let_relation
@@ -1656,23 +1590,23 @@ class LetterFrequencyChecker(Instruction):
     )
 
     return self._description_pattern.format(
-        letter=self._letter,
-        let_frequency=self._frequency,
-        let_relation=self._comparison_relation,
+      letter=self._letter,
+      let_frequency=self._frequency,
+      let_relation=self._comparison_relation,
     )
 
   def get_instruction_args(self):
-    """Returns the keyword args of build description."""
+    """`build_description`のキーワード引数を返します。"""
     return {"letter": self._letter,
             "let_frequency": self._frequency,
             "let_relation": self._comparison_relation}
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返す。"""
     return ["letter", "let_frequency", "let_relation"]
 
   def check_following(self, value):
-    """Checks that the response contains the letter at the right frequency."""
+    """応答に指定された頻度で文字が含まれているかをチェックします。"""
     letters = collections.Counter(value)
 
     katakana_letter = chr(ord(self._letter) + 96)
@@ -1680,31 +1614,31 @@ class LetterFrequencyChecker(Instruction):
     total_count = letters[self._letter] + letters[katakana_letter]
 
     if self._comparison_relation == _COMPARISON_RELATION[0]:
-        return total_count < self._frequency
+      return total_count < self._frequency
     else:
-        return total_count >= self._frequency
+      return total_count >= self._frequency
 
 
 class FuriganaForKanji(Instruction):
-  """Checks all kanji is described with furigana."""
+  """全ての漢字にふりがながついているか確認します。"""
 
   def build_description(self):
-    """Build the instruction description."""
+    """指示文を作成します。"""
     self._description_pattern = (
         "全ての漢字にふりがなをつけてください。ふりがなは（）の中に書いてください。"
     )
     return self._description_pattern
   
   def get_instruction_args(self):
-    """Returns the keyword args of build description."""
+    """build_descriptionのキーワード引数を返します。"""
     return None
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return []
 
   def check_following(self, value):
-    """Checks if all kanji is described with furigana"""
+    """全ての漢字にふりがながついているか確認します。"""
     kanji_pattern = r'[\u4e00-\u9faf]+'
     kanji_with_furigana_pattern = r'[\u4e00-\u9faf]+（[ぁ-ん]+）'
 
@@ -1712,73 +1646,74 @@ class FuriganaForKanji(Instruction):
     kanji_with_furigana_count = len(re.findall(kanji_with_furigana_pattern, value))
 
     return kanji_count == kanji_with_furigana_count
-  
+
+
 
 class PeriodChecker(Instruction):
-  """Checks the response for no periods."""
+  """応答に句点が含まれていないかを確認します。"""
 
   def build_description(self):
-    """Build the instruction description."""
+    """指示文を作成します。"""
     self._description_pattern = (
         "応答全体で句点を使用しないでください。"
     )
     return self._description_pattern
 
   def get_instruction_args(self):
-    """Returns the keyword args of build description."""
+    """build_descriptionのキーワード引数を返します。"""
     return None
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return []
 
   def check_following(self, value):
-    """Checks that the response does not contain periods."""
+    """応答に句点が含まれていないかを確認します。"""
     return not re.search(r"\。", value)
 
 
 class CommaChecker(Instruction):
-  """Checks the response for no commas."""
+  """応答に読点が含まれていないかを確認します。"""
 
   def build_description(self):
-    """Build the instruction description."""
+    """指示文を作成します。"""
     self._description_pattern = (
         "応答全体で読点を使用しないでください。"
     )
     return self._description_pattern
 
   def get_instruction_args(self):
-    """Returns the keyword args of build description."""
+    """build_descriptionのキーワード引数を返します。"""
     return None
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return []
 
   def check_following(self, value):
-    """Checks that the response does not contain commas."""
+    """応答に読点が含まれていないかを確認します。"""
     return not re.search(r"\、", value)
 
 
 class QuotationChecker(Instruction):
-  """Checks response is wrapped with double quotation marks."""
+  """応答が鉤括弧で囲まれているかを確認します。"""
 
   def build_description(self):
-    """Build the instruction description."""
+    """指示文を作成します。"""
     self._description_pattern = (
         "応答全体を鉤括弧で囲んでください。"
     )
     return self._description_pattern
 
   def get_instruction_args(self):
-    """Returns the keyword args of build description."""
+    """build_descriptionのキーワード引数を返します。"""
     return None
 
   def get_instruction_args_keys(self):
-    """Returns the args keys of `build_description`."""
+    """`build_description`の引数キーを返します。"""
     return []
 
   def check_following(self, value):
-    """Checks if the response is wrapped with double quotation marks."""
+    """応答が鉤括弧で囲まれているかを確認します。"""
     value = value.strip()
     return len(value) > 1 and value[0] == '「' and value[-1] == '」'
